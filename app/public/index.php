@@ -193,6 +193,8 @@
 
             nonSelectedFilters = response.nonSelectedFilters;
             updateSelect();
+
+            document.querySelector('img').style = response.style;
         };
 
         xhr.send(JSON.stringify(selectedFilters));
