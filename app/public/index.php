@@ -54,27 +54,7 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .blur {
-            -webkit-filter: blur(5px);
-            filter: blur(5px);
-        }
-        .rotate {
-            -webkit-transform: rotate(180deg);
-            transform: rotate(180deg);
-        }
-        .grayscale {
-            -webkit-filter: grayscale(100%);
-            filter: grayscale(100%);
-        }
-        .invert {
-            -webkit-filter: invert(100%);
-            filter: invert(100%);
-        }
-        .sepia {
-            -webkit-filter: sepia(100%);
-            filter: sepia(100%);
-        }
-        #list {
+        .list-container {
             width: 10%;
             position: absolute;
             top: 0;
@@ -86,7 +66,10 @@
             padding: 10px;
             border: 1px solid #fff;
             border-radius: 8px;
+        }
+        #list {
             list-style: none;
+            padding: 0;
         }
         #list > li {
             padding: 3px;
@@ -122,24 +105,18 @@
             font-size: 18px;
             font-weight: 700;
         }
-
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Select what to do with the image:</h1>
         <img src="https://picsum.photos/1920/1080" alt="Image">
-        <ul id="list">
+        <div class="list-container">
             <p class="title">Filters:</p>
-        </ul>
+            <ul id="list"></ul>
+        </div>
         <form action="index.php" method="post">
-            <select name="action">
-                <option value="blur">Blur</option>
-                <option value="rotate">Rotate</option>
-                <option value="grayscale">Grayscale</option>
-                <option value="invert">Invert</option>
-                <option value="sepia">Sepia</option>
-            </select>
+            <select name="action"></select>
             <button type="button" class="add-button" name="action">Add</button>
         </form>
     </div>
@@ -148,37 +125,75 @@
     const select = document.querySelector('select');
     const list = document.querySelector('#list');
     const img = document.querySelector('img');
+    let selectedFilters = [];
+    let nonSelectedFilters = [];
+
+    function updateList() {
+        list.innerHTML = '';
+        selectedFilters.forEach(filter => {
+            const li = document.createElement('li');
+            li.innerHTML = filter.charAt(0).toUpperCase() + filter.slice(1);
+            const button = document.createElement('button');
+            button.classList.add('remove-button');
+            button.innerHTML = '&times';
+            button.addEventListener('click', () => {
+                removeFilter(filter, li);
+            });
+
+            li.appendChild(button);
+            list.appendChild(li);
+        });
+    }
+
+    function updateSelect() {
+        select.innerHTML = '';
+        nonSelectedFilters.forEach(filter => {
+            const option = document.createElement('option');
+            option.value = filter;
+            option.innerHTML = filter.charAt(0).toUpperCase() + filter.slice(1);
+            select.appendChild(option);
+        });
+    }
 
     document.querySelector('.add-button').addEventListener('click', function() {
-        const li = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'remove-button';
-        button.innerHTML = '&times';
-
-        const value = select.options[select.selectedIndex].value;
-        button.addEventListener('click', function() {
-            removeFilter(value, li);
-        });
-        li.innerHTML = value.charAt(0).toUpperCase() + value.slice(1);
-
-        li.appendChild(button);
-
-        list.appendChild(li);
+        const value = select.value;
+        if (value && !selectedFilters.includes(value)) {
+            selectedFilters.push(value);
+            updateList();
+        }
 
         select.options[select.selectedIndex].remove();
-        img.classList.add(value);
     });
 
     function removeFilter(filter, li) {
-        img.classList.remove(filter);
+        index = selectedFilters.indexOf(filter);
+        selectedFilters.splice(index, 1);
 
-        const option = document.createElement('option');
-        option.value = filter;
-        option.text = filter.charAt(0).toUpperCase() + filter.slice(1);
-        select.add(option);
-
-        li.remove();
+        nonSelectedFilters.push(filter);
+        updateList();
+        updateSelect();
     }
+
+    function processFilters() {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', 'http://127.0.0.1/process.php');
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                return;
+            }
+
+            const response = JSON.parse(xhr.responseText);
+
+            selectedFilters = response.selectedFilters;
+            updateList();
+
+            nonSelectedFilters = response.nonSelectedFilters;
+            updateSelect();
+        };
+        xhr.send(JSON.stringify(selectedFilters));
+    }
+
+    processFilters();
 </script>
 </html>
