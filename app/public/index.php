@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Processing video</title>
+    <title>Processing images</title>
     <style>
         body {
             background-color: #333;
