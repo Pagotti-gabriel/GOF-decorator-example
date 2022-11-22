@@ -118,17 +118,17 @@
         <form action="index.php" method="post">
             <select name="action"></select>
             <button type="button" class="add-button" name="action">Add</button>
+            <button type="button" class="add-button" name="process" onclick="processFilters()">Process</button>
         </form>
     </div>
 </body>
 <script>
-    const select = document.querySelector('select');
-    const list = document.querySelector('#list');
-    const img = document.querySelector('img');
     let selectedFilters = [];
     let nonSelectedFilters = [];
 
     function updateList() {
+        const list = document.querySelector('#list');
+
         list.innerHTML = '';
         selectedFilters.forEach(filter => {
             const li = document.createElement('li');
@@ -146,9 +146,10 @@
     }
 
     function updateSelect() {
+        select = document.querySelector('select');
         select.innerHTML = '';
         nonSelectedFilters.forEach(filter => {
-            const option = document.createElement('option');
+            option = document.createElement('option');
             option.value = filter;
             option.innerHTML = filter.charAt(0).toUpperCase() + filter.slice(1);
             select.appendChild(option);
@@ -156,7 +157,8 @@
     }
 
     document.querySelector('.add-button').addEventListener('click', function() {
-        const value = select.value;
+        select = document.querySelector('select');
+        value = select.value;
         if (value && !selectedFilters.includes(value)) {
             selectedFilters.push(value);
             updateList();
@@ -177,7 +179,8 @@
     function processFilters() {
         const xhr = new XMLHttpRequest();
 
-        xhr.open('GET', 'http://127.0.0.1/process.php');
+        params = getParamsToURL();
+        xhr.open('GET', 'http://127.0.0.1/process.php?'+params);
         xhr.onload = function() {
             if (xhr.status !== 200) {
                 return;
@@ -191,7 +194,17 @@
             nonSelectedFilters = response.nonSelectedFilters;
             updateSelect();
         };
+
         xhr.send(JSON.stringify(selectedFilters));
+    }
+
+    function getParamsToURL() {
+        let params = '';
+        selectedFilters.forEach(filter => {
+            params += `&filters[]=${filter}`;
+        });
+
+        return params;
     }
 
     processFilters();

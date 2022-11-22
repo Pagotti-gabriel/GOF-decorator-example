@@ -11,10 +11,11 @@ const FILTERS = [
 ];
 
 $selectedFilters = $_GET['filters'] ?? [];
-$nonSelectedFilters = array_diff(FILTERS, $selectedFilters);
+
+$nonSelectedFilters = array_values(array_diff(FILTERS, $selectedFilters));
+$nonSelectedFilters = array_values($nonSelectedFilters);
 
 echo json_encode([
-    'filters' => FILTERS,
     'selectedFilters' => $selectedFilters,
     'nonSelectedFilters' => $nonSelectedFilters,
 ]);
