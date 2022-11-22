@@ -15,7 +15,7 @@ $nonSelectedFilters = array_diff(FILTERS, $selectedFilters);
 
 echo json_encode([
     'filters' => FILTERS,
-    'selectedFilters' => FILTERS,
-    'nonSelectedFilters' => [],
+    'selectedFilters' => $selectedFilters,
+    'nonSelectedFilters' => $nonSelectedFilters,
 ]);
 
