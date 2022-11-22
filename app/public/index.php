@@ -75,6 +75,7 @@
             filter: sepia(100%);
         }
         #list {
+            width: 10%;
             position: absolute;
             top: 0;
             left: 0;
@@ -87,6 +88,16 @@
             border-radius: 8px;
             list-style: none;
         }
+        #list > li {
+            padding: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+        #list > li:hover {
+            background-color: #555;
+            border-radius: 8px;
+        }
+
         .remove-button {
             border: 2px solid #f44336;
             background-color: transparent;
@@ -105,13 +116,21 @@
             border-color: #d32f2f;
             color: white;
         }
+        .title {
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Select what to do with the image:</h1>
         <img src="https://picsum.photos/1920/1080" alt="Image">
-        <ul id="list" style="display: none;">
+        <ul id="list">
+            <p class="title">Filters:</p>
         </ul>
         <form action="index.php" method="post">
             <select name="action">
@@ -133,10 +152,11 @@
     document.querySelector('.add-button').addEventListener('click', function() {
         const li = document.createElement('li');
         const button = document.createElement('button');
-        const value = select.options[select.selectedIndex].value;
         button.type = 'button';
         button.className = 'remove-button';
         button.innerHTML = '&times';
+
+        const value = select.options[select.selectedIndex].value;
         button.addEventListener('click', function() {
             removeFilter(value, li);
         });
@@ -145,7 +165,6 @@
         li.appendChild(button);
 
         list.appendChild(li);
-        list.style.display = 'block';
 
         select.options[select.selectedIndex].remove();
         img.classList.add(value);
@@ -160,10 +179,6 @@
         select.add(option);
 
         li.remove();
-
-        if (list.children.length === 0) {
-            list.style.display = 'none';
-        }
     }
 </script>
 </html>
